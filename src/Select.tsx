@@ -1,8 +1,9 @@
 import React from "react";
+import styles from "./select.module.css";
 
 type SelectOption = {
   label: string;
-  value: string;
+  value: any;
 };
 
 type SelectProps = {
@@ -12,5 +13,19 @@ type SelectProps = {
 };
 
 export default function Select({ value, onChange, options }: SelectProps) {
-  return <div>Select</div>;
+  return (
+    <div tabIndex={0} className={styles.container}>
+      <span className={styles.value}>Value</span>
+      <button className={styles["clear-btn"]}>&times;</button>
+      <div className={styles.divider} />
+      <div className={styles.caret} />
+      <ul className={`${styles.options} ${styles.show}`}>
+        {options.map((option) => (
+          <li key={option.label} className={styles.options}>
+            {option.label}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
