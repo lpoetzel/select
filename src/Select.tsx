@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./select.module.css";
 
 type SelectOption = {
   label: string;
-  value: any;
+  value: string | number;
 };
 
 type SelectProps = {
@@ -14,6 +14,21 @@ type SelectProps = {
 
 export default function Select({ value, onChange, options }: SelectProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [highlitedIndex, setHighlitedIndex] = useState(0);
+
+  function clearOptions() {
+    onChange(undefined);
+  }
+
+  function selectOption(option: SelectOption) {
+    if (option !== value) onChange(option);
+  }
+  function isOptionSelected(option: SelectOption) {
+    return option === value;
+  }
+  useEffect(() => {
+    if (isOpen) setHighlitedIndex(0);
+  }, [isOpen]);
   return (
     <div
       onBlur={() => setIsOpen(false)}
@@ -22,12 +37,32 @@ export default function Select({ value, onChange, options }: SelectProps) {
       className={styles.container}
     >
       <span className={styles.value}>{value?.label}</span>
-      <button className={styles["clear-btn"]}>&times;</button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          clearOptions();
+        }}
+        className={styles["clear-btn"]}
+      >
+        &times;
+      </button>
       <div className={styles.divider} />
       <div className={styles.caret} />
       <ul className={`${styles.options} ${isOpen ? styles.show : ""}`}>
-        {options.map((option) => (
-          <li key={option.label} className={styles.options}>
+        {options.map((option, index) => (
+          <li
+            onClick={(e) => {
+              e.stopPropagation();
+              selectOption(option);
+              setIsOpen(false);
+            }}
+            onMouseEnter={() => setHighlitedIndex(index)}
+            key={option.label}
+            className={`${styles.options} ${
+              isOptionSelected(option) ? styles.selected : ""
+            } ${index === highlitedIndex ? styles.highlighted : ""}
+            `}
+          >
             {option.label}
           </li>
         ))}
